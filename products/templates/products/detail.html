@@ -53,6 +53,14 @@
         </div>
     </div>
 </nav>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
 <!-- Product section-->
 <section class="py-5">
     <div class="container px-4 px-lg-5 my-5">
@@ -75,26 +83,41 @@
                     </div>
                     <p class="lead">{{ product.description }}</p>
                     <div class="d-flex">
-                        <form>
+                        <form method="post" action="{% url 'product_order' product.id %}">
+                            {% csrf_token %}
                             <div class="form-group">
                                 <h2>Place an order</h2>
                             </div>
+                            <div>
+                                {% if form.errors %}
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                            <div class="alert alert-danger">
+                                                <p> {{ error }} </p>
+                                            </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
                             <div class="form-group mb-3">
                                 <label for="formGroupExampleInput">Your name</label>
-                                <input type="text" class="form-control" placeholder="Your name">
+                                <input type="text" id="formGroupExampleInput" class="form-control" name="username" placeholder="Your name">
                             </div>
                             <div class="form-group mb-3">
                                 <label for="formGroupExampleInput2">Your phone</label>
-                                <input type="text" class="form-control" placeholder="Your phone">
+                                <input type="text" id="formGroupExampleInput2" class="form-control" name="phone" placeholder="Your phone number">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="formGroupExampleInput3">quantity</label>
+                                <input type="number" id="formGroupExampleInput3" class="form-control" name="quantity" placeholder="quantity">
                             </div>
 
 
                             <div class="form-group mb-3">
-                                <form method="POST">
-                                    {% csrf_token %}
-                                    {{ form.as_p }}
-                                    <button type="submit" class="btn btn-success">Send</button>
-                                </form>
+
+
+                                <button type="submit" class="btn btn-success">Send</button>
+
                             </div>
                         </form>
 
@@ -114,15 +137,16 @@
             {% if comments %}
 
                 {% for comment in comments %}
-                    <!--to limit bad words-->
-                    {% if comment.comment_check %}
-                        <div class="media card p-4 mt-2">
-                            <div class="media-body">
-                                {{ comment.username }}<br>
-                                {{ comment.comment }}
-                            </div>
+
+                    <div class="media card p-4 mt-2">
+
+                        <div class="media-body">
+                            <h3>{{ comment.name }}</h3>
+
+                            {{ comment.comment }}
                         </div>
-                    {% endif %}
+                    </div>
+
                 {% endfor %}
             {% else %}
                 <p>No comments yet.</p>
@@ -135,29 +159,38 @@
                 <div class="text-center">
                     <h3>Add Comment</h3>
                 </div>
+                <div>
+                    {% if form.errors %}
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    <p> {{ error }} </p>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
 
-                <form method="POST">
+                <form method="post" action="{% url 'product_comment' product.id %}">
                     {% csrf_token %}
                     <div class="form-group mb-3">
-                        <input type="text" class="form-control" placeholder="Your name">
+                        <input type="text" class="form-control" name="name" placeholder="Your name">
                     </div>
                     <div class="form-group mb-3">
-                        <input type="text" class="form-control" placeholder="Your email">
+                        <input type="email" class="form-control" name="email" placeholder="Your email">
                     </div>
 
                     <div class="form-group mb-3">
-                        <textarea name="" class="form-control" id="" cols="30" rows="10"
+                        <textarea name="comment" id="" class="form-control" cols="30" rows="10"
                                   placeholder="comment"></textarea>
                     </div>
 
                     <div class="form-group mb-3">
 
-
-                        {{ form.as_p }}
                         <button type="submit" class="btn btn-success">Send</button>
 
                     </div>
-                </form>
+
                 </form>
 
             </div>

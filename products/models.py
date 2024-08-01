@@ -32,12 +32,6 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     @property
-    def product_status(self):
-        if self.quantity > 0:
-            return True
-        return False
-
-    @property
     def discount_price(self):
         if self.discount > 0:
             return self.price * (1 - self.discount / 100)
@@ -47,36 +41,26 @@ class Product(models.Model):
         return self.name
 
 
-class ProductComment(models.Model):
+class Comment(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments', null=True)
-    username = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100, null=True)
     comment = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    # to limit bad words
-    @property
-    def comment_check(self):
-        # for bad words
-        bad_words = ['love']
-        if self.comment:
-            for word in bad_words:
-                if word not in self.comment:
-                    return True
-            return False
+    is_provide = models.BooleanField(default=True)  # so that we don't show commentaries when we want
 
     def __str__(self):
-        return self.comment
+        return f'{self.name} , {self.comment}'
 
 
 class Order(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='orders', null=True)
     username = models.CharField(max_length=100)
-    phone = models.IntegerField(null=True)
+    phone = models.CharField(max_length=50, null=True)
     quantity = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.username
+        return f'{self.username} , {self.product}'

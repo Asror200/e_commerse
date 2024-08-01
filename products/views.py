@@ -1,87 +1,100 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import CommentForm, OrderForm, SignUpForm
-from products.models import Product, ProductComment, Category
+from django.shortcuts import render, redirect
+from .forms import CommentModelForm, OrderModelForm, SignUpForm
+from products.models import Product, Comment, Category
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from typing import Optional
 
 
 # home page it reflects all products in the website
-def home(request):
-    products = Product.objects.all()  # order_by('-rating')
+def home(request, _id: Optional[int] = None):
+    if _id:
+        products = Product.objects.filter(category=_id)
+    else:
+        products = Product.objects.all().order_by('-created_at')
     categories = Category.objects.all()
     context = {'products': products,
                'categories': categories}
     return render(request, 'products/home.html', context)
 
 
-def category_list(request, _id):
-    category = Category.objects.get(pk=_id)
-    categories = Category.objects.all()
-    products = category.products.all()
-    context = {'categories': categories,
-               'products': products}
-    return render(request, 'products/home.html', context)
-
-
 # detail page for products
 def detail(request, _id):
     product = Product.objects.get(pk=_id)
-    products = Product.objects.filter(category=product.category).exclude(id=_id)
-    comments = ProductComment.objects.filter(product=product.id)
+    related_products = Product.objects.filter(category=product.category).exclude(id=_id)
+    comments = Comment.objects.filter(product=_id).order_by('-created_at')[:3]  #to get only the last 3 comments from the database
     categories = Category.objects.all()
+    new_comment = None
+    new_order = None
+    if request.method == 'POST':
+        comment_form = CommentModelForm(request.POST)
+        order_form = OrderModelForm(request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.product = product
+            new_comment.save()
+            messages.success(request, 'Your comment has been saved.')
+            return redirect('detail', product.id)
+        if order_form.is_valid():
+            quantity = order_form.cleaned_data['quantity']
+            if product.quantity >= int(quantity):
+                product.quantity -= int(quantity)
+                product.save()
+
+                new_order = order_form.save(commit=False)
+                new_order.product = product
+                new_order.save()
+                messages.success(request, 'Your order has been submitted!')
+                return redirect('detail', _id=_id)
+            else:
+                messages.error(request, 'Not enough stock available.')
     context = {
+        'new_comment': new_comment,
+        'new_order': new_order,
         'categories': categories,
         'comments': comments,
-        'products': products,
+        'products': related_products,
         'product': product
     }
     return render(request, 'products/detail.html', context)
 
 
 # comment for products
-def product_comment(request, product_id):
-    product = Product.objects.get(pk=product_id)
-    comments = ProductComment.objects.filter(product=product)
-
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.product = product.id
-            comment.save()
-            return redirect('product_detail', product_id=product.id)
-    else:
-        form = CommentForm()
-
-    return render(request, 'products/detail.html', {
-        'product': product,
-        'comments': comments,
-        'form': form,
-    })
-
-
-def product_order(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            order = form.save(commit=False)
-            order.product = product
-            order.save()
-            return redirect('order_success')
-    else:
-        form = OrderForm()
-
-    return render(request, 'products/detail.html', {
-        'product': product,
-        'form': form,
-    })
-
-
-def order_success(request):
-    return render(request, 'products/order_success.html')
-
+# def add_order(request, _id: Optional[int] = None):
+#     product = Product.objects.get(id=_id)
+#
+#     if request.method == 'POST':
+#         form = OrderModelForm(request.POST)
+#         if form.is_valid():
+#             order = form.save(commit=False)
+#             order.product = product
+#             order.save()
+#             return redirect('home')
+#     else:
+#         form = OrderModelForm()
+#     context = {'form': form,
+#                'product': product}
+#     return render(request, 'products/detail.html', context)
+#
+#
+# def add_comment(request, _id):
+#     product = Product.objects.get(pk=_id)
+#     if request.method == 'POST':
+#         form = CommentModelForm(request.POST)
+#         if form.is_valid():
+#             comment = form.save(commit=False)
+#             comment.product = product
+#             comment.save()
+#             return redirect('detail', _id)
+#     else:
+#         form = CommentModelForm()
+#     context = {
+#             'form': form,
+#             'product': product
+#         }
+#
+#     return render(request, 'products/detail.html', context)
+#
 
 def about(request):
     return render(request, 'products/about.html')

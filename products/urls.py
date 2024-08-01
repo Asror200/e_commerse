@@ -5,10 +5,10 @@ from django.conf import settings
 
 urlpatterns = [
                   path('', views.home, name='home'),
-                  path('category/<int:_id>', views.category_list, name='category'),
+                  path('category/<int:_id>', views.home, name='category'),
                   path('detail/<int:_id>', views.detail, name='detail'),
-                  path('product/<int:product_id>/', views.product_comment, name='product_comment'),
-                  path('product/<int:product_id>/', views.product_order, name='product_order'),
+                  path('product/<int:_id>/', views.detail, name='product_comment'),
+                  path('product/<int:_id>/', views.detail, name='product_order'),
                   path('about/', views.about, name='about'),
                   path('all-products/', views.home, name='index'),
                   path('exspensive-products/', views.expensive, name='expensive'),

@@ -1,19 +1,25 @@
 from django import forms
-from .models import ProductComment, Order
+from .models import Comment, Order
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
 
-class CommentForm(forms.ModelForm):
+class CommentModelForm(forms.ModelForm):
     class Meta:
-        model = ProductComment
-        fields = ['username', 'email', 'comment']
+        model = Comment
+        fields = ['name', 'email', 'comment', ]
 
 
-class OrderForm(forms.ModelForm):
+class OrderModelForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['product', 'username', 'phone']
+        fields = ['username', 'phone', 'quantity', ]
+
+    def clean_quantity(self):
+        quantity = self.data.get('quantity')
+        if int(quantity) <= 0:
+            raise forms.ValidationError("Quantity must be greater than 0.")
+        return quantity
 
 
 class SignUpForm(UserCreationForm):
