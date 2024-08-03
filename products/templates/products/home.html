@@ -49,6 +49,42 @@
                         {% endfor %}
                     </ul>
                 </li>
+                <!-- Product add selection-->
+                {% if user.is_authenticated %}
+                    <form action="{% url 'add_product' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-light">
+                            Add product
+                        </button>
+                    </form>
+
+                {% else %}
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal"
+                            data-bs-target="#addProductModel">
+                        Add product
+                    </button>
+                    <div class="modal fade" id="addProductModel" tabindex="-1" aria-labelledby="addProductModalLabel"
+                         aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="addProductModalLabel">Add new product</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        You must login first to add a product
+                    </div>
+                    <form action="{% url 'register' %}">
+                        {% csrf_token %}
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-secondary">Register</button>
+                    </form>
+                    <form action="{% url 'login' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">I already have an account</button>
+                    </form>
+                {% endif %}
             </ul>
             <!--Search-->
             <form class="d-flex">
@@ -58,12 +94,20 @@
         </div>
     </div>
 </nav>
+<!-- Message send -->
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        {% if 'success' in message.tags %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% else %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
     {% endfor %}
 {% endif %}
 <!-- Header-->
@@ -76,7 +120,6 @@
     </div>
 </header>
 <!-- Section-->
-
 <div class="container mt-5">
     <div class="text-left">
         <h3>Filter by</h3>
@@ -96,6 +139,7 @@
 
     </div>
 </div>
+
 <!--Products-->
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">

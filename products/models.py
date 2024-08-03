@@ -3,15 +3,22 @@ from django.db import models
 
 
 # Create your models here.
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-class Category(models.Model):
+    class Meta:
+        abstract = True
+
+
+class Category(BaseModel):
     title = models.CharField(max_length=50)
 
     def __str__(self):
         return self.title
 
 
-class Product(models.Model):
+class Product(BaseModel):
     class RatingChoices(models.IntegerChoices):
         zero = 0
         one = 1
@@ -28,8 +35,7 @@ class Product(models.Model):
     rating = models.PositiveSmallIntegerField(choices=RatingChoices.choices, default=RatingChoices.zero.value)
     discount = models.PositiveSmallIntegerField(default=0)
     image = models.ImageField(upload_to='images', null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
 
     @property
     def discount_price(self):
@@ -41,26 +47,25 @@ class Product(models.Model):
         return self.name
 
 
-class Comment(models.Model):
+class Comment(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments', null=True)
     name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100, null=True)
     comment = models.TextField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     is_provide = models.BooleanField(default=True)  # so that we don't show commentaries when we want
 
     def __str__(self):
-        return f'{self.name} , {self.comment}'
+        return f'{self.name} , {self.comment} , {self.created_at} , {self.updated_at}'
 
 
-class Order(models.Model):
+class Order(BaseModel):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='orders', null=True)
     username = models.CharField(max_length=100)
     phone = models.CharField(max_length=50, null=True)
     quantity = models.IntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.username} , {self.product}'
+
+
+

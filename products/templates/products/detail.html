@@ -24,11 +24,11 @@
                 class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
                 <li class="nav-item dropdown">
 
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         {% for category in categories %}
@@ -40,25 +40,88 @@
                         {% endfor %}
 
                     </ul>
-                </li>
-            </ul>
-            <form class="d-flex">
-                <input type="text" class="form-contro">
-                <button class="btn btn-outline-dark" type="submit">
-                    <i class="bi-search-fill me-1"></i>
-                    Search
 
+                </li>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#deleteModel">
+                    Delete
                 </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="deleteModel" tabindex="-1" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Delete</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Do you want to delete, are you sure?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                <form action="{% url 'delete_product' product.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary">Yes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#updateModel">
+                    Update
+                </button>
+                <div class="modal fade" id="updateModel" tabindex="-1" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Update</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Do you want to update, are you sure?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                <form action="{% url 'edit_product' product.id %}" >
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary">Yes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </ul>
+
+
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
+
+
         </div>
     </div>
+
 </nav>
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        {% if 'success' in message.tags %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% else %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
     {% endfor %}
 {% endif %}
 <!-- Product section-->
@@ -83,45 +146,44 @@
                     </div>
                     <p class="lead">{{ product.description }}</p>
                     <div class="d-flex">
-                        <form method="post" action="{% url 'product_order' product.id %}">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <h2>Place an order</h2>
-                            </div>
-                            <div>
+                        <!-- Order Form Section -->
+                        {% if product.quantity %}
+                            <form method="post" action="{% url 'product_order' product.id %}">
+                                {% csrf_token %}
+                                <div class="form-group mb-3">
+                                    <input type="text" class="form-control" name="username"
+                                           placeholder="Your name" value="{{ form.username.value }}">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <input type="text" class="form-control" name="phone"
+                                           placeholder="Your phone number" value="{{ form.phone.value }}">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <input type="number" class="form-control" name="quantity"
+                                           placeholder="Quantity" value="{{ form.quantity.value }}">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <button type="submit" class="btn btn-success">Send</button>
+                                </div>
                                 {% if form.errors %}
-                                    {% for field in form %}
-                                        {% for error in field.errors %}
-                                            <div class="alert alert-danger">
-                                                <p> {{ error }} </p>
-                                            </div>
+                                    <div class="alert alert-danger">
+                                        {% for field in form %}
+                                            {% for error in field.errors %}
+                                                <p>{{ field.label }}: {{ error }}</p>
+                                            {% endfor %}
                                         {% endfor %}
-                                    {% endfor %}
+                                    </div>
                                 {% endif %}
+                            </form>
+                        {% else %}
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="formGroupExampleInput">Your name</label>
-                                <input type="text" id="formGroupExampleInput" class="form-control" name="username" placeholder="Your name">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="formGroupExampleInput2">Your phone</label>
-                                <input type="text" id="formGroupExampleInput2" class="form-control" name="phone" placeholder="Your phone number">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="formGroupExampleInput3">quantity</label>
-                                <input type="number" id="formGroupExampleInput3" class="form-control" name="quantity" placeholder="quantity">
-                            </div>
+                            <p class="lead" style="background-color: #fcf77a ">It is not possible to place an order because the product is out of stock. We will try to solve this problem as soon as we can</p>
+                            <div class="d-flex">
+                        {% endif %}
 
 
-                            <div class="form-group mb-3">
-
-
-                                <button type="submit" class="btn btn-success">Send</button>
-
-                            </div>
-                        </form>
-
-                    </div>
+                        <!-- Order form end -->
+                        </div>
                 </div>
             </div>
         </div>
@@ -159,39 +221,39 @@
                 <div class="text-center">
                     <h3>Add Comment</h3>
                 </div>
-                <div>
-                    {% if form.errors %}
-                        {% for field in form %}
-                            {% for error in field.errors %}
-                                <div class="alert alert-danger">
-                                    <p> {{ error }} </p>
-                                </div>
-                            {% endfor %}
-                        {% endfor %}
-                    {% endif %}
-                </div>
 
+                <!-- Comment Form Section -->
                 <form method="post" action="{% url 'product_comment' product.id %}">
                     {% csrf_token %}
                     <div class="form-group mb-3">
-                        <input type="text" class="form-control" name="name" placeholder="Your name">
+                        <label for="name">Your name</label>
+                        <input type="text" id="name" class="form-control" name="name" placeholder="Your name"
+                               value="{{ form.name.value }}">
                     </div>
                     <div class="form-group mb-3">
-                        <input type="email" class="form-control" name="email" placeholder="Your email">
+                        <label for="email">Your email</label>
+                        <input type="email" id="email" class="form-control" name="email" placeholder="Your email"
+                               value="{{ form.email.value }}">
                     </div>
-
                     <div class="form-group mb-3">
-                        <textarea name="comment" id="" class="form-control" cols="30" rows="10"
-                                  placeholder="comment"></textarea>
+                        <label for="comment">Comment</label>
+                        <textarea id="comment" name="comment" class="form-control" cols="30" rows="10"
+                                  placeholder="Comment">{{ form.comment.value }}</textarea>
                     </div>
-
                     <div class="form-group mb-3">
-
                         <button type="submit" class="btn btn-success">Send</button>
-
                     </div>
-
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <p>{{ field.label }}: {{ error }}</p>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </form>
+
 
             </div>
 
