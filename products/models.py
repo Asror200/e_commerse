@@ -36,7 +36,6 @@ class Product(BaseModel):
     discount = models.PositiveSmallIntegerField(default=0)
     image = models.ImageField(upload_to='images', null=True, blank=True)
 
-
     @property
     def discount_price(self):
         if self.discount > 0:
@@ -66,6 +65,3 @@ class Order(BaseModel):
 
     def __str__(self):
         return f'{self.username} , {self.product}'
-
-
-

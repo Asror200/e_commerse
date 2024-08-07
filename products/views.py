@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+
+from cart.cart import Cart
 from .forms import CommentModelForm, OrderModelForm, SignUpForm, UpdateProductModelForm, AddProductModelForm
 from products.models import Product, Comment, Category
 from django.contrib.auth import authenticate, login, logout
@@ -8,23 +10,59 @@ from django.contrib.auth.decorators import login_required
 
 
 def home(request, _id: Optional[int] = None):  # home page it reflects all products in the website
-    if _id:
-        products = Product.objects.filter(category=_id)
-    else:
-        products = Product.objects.all().order_by('-created_at')
+    cart = Cart(request)
+    """ 
+    it is for showing quantity of product in your cart
+    """
+    product_quantity = cart.product_quantity()
     categories = Category.objects.all()
+    search = request.GET.get('search')
+    filter_type = request.GET.get('filter', '')
+    if _id:
+        if filter_type == 'expensive':
+            products = Product.objects.filter(category=_id).order_by('-price')
+        elif filter_type == 'cheap':
+            products = Product.objects.filter(category=_id).order_by('price')
+        elif filter_type == 'rating':
+            products = Product.objects.filter(category=_id).order_by('-rating')
+        else:
+            products = Product.objects.filter(category=_id).order_by('-created_at')
+    else:
+        if filter_type == 'expensive':
+            products = Product.objects.order_by('-price')
+        elif filter_type == 'cheap':
+            products = Product.objects.order_by('price')
+        elif filter_type == 'rating':
+            products = Product.objects.order_by('-rating')
+        else:
+            products = Product.objects.all().order_by('-created_at')
+    if search:
+        products = products.filter(name__icontains=search)
     context = {'products': products,
-               'categories': categories}
+               'categories': categories,
+               'product_quantity': product_quantity,
+               }
     return render(request, 'products/home.html', context)
 
 
 def detail(request, _id):  # detail page for products
+    cart = Cart(request)
+    """ 
+    it is for showing quantity of product in your cart
+    """
+    product_quantity = cart.product_quantity()
     product = Product.objects.get(pk=_id)
     related_products = Product.objects.filter(category=product.category).exclude(id=_id)
-    comments = Comment.objects.filter(product=_id).order_by('-created_at')[
-               :3]  # to get only the last 3 comments from the database
+    search = request.GET.get('search')
+    if search:
+        """searching comment by word in comments"""
+        comments = Comment.objects.filter(comment__icontains=search)
+    else:
+        comments = Comment.objects.filter(product=_id).order_by('-created_at')[
+                   :3]  # to get only the last 3 comments from the database
     categories = Category.objects.all()
     context = {
+        'product_quantity': product_quantity,
         'categories': categories,
         'comments': comments,
         'products': related_products,
@@ -124,30 +162,6 @@ def about(request):  # about page
     return render(request, 'products/about.html')
 
 
-def expensive(request):  # filter by expensive
-    categories = Category.objects.all()
-    products = Product.objects.order_by('-price')
-    context = {'categories': categories,
-               'products': products}
-    return render(request, 'products/home.html', context)
-
-
-def cheap(request):  # filter by cheap
-    categories = Category.objects.all()
-    products = Product.objects.order_by('price')
-    context = {'categories': categories,
-               'products': products}
-    return render(request, 'products/home.html', context)
-
-
-def ratings(request):  # filter by rating
-    categories = Category.objects.all()
-    products = Product.objects.order_by('-rating')
-    context = {'categories': categories,
-               'products': products}
-    return render(request, 'products/home.html', context)
-
-
 def register_user(request):  # register user
     form = SignUpForm()
     if request.method == 'POST':
@@ -189,3 +203,7 @@ def logout_user(request):  # logout user
     logout(request)
     messages.success(request, 'You have been logged out.')
     return redirect('home')
+
+
+def shopping_cart(request):
+    pass

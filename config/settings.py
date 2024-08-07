@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'products.apps.ProductsConfig',
+    'cart.apps.CartConfig',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cart.context_processors.cart',
             ],
         },
     },
@@ -111,11 +113,31 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+#----------------------------------------------------------------------------------------
+# settings.py
 
+# Sessiya ma'lumotlari saqlanadigan backend
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # yoki boshqa backend
+
+# Sessiya cookie nomi
+SESSION_COOKIE_NAME = 'sessionid'
+
+# Sessiya cookie muddati
+SESSION_COOKIE_AGE = 1209600  # 2 hafta, sekundlarda
+
+# Sessiya cookie'ni HTTP orqali faqat yuborish (xavfsizlik uchun)
+SESSION_COOKIE_SECURE = False  # True bo'lishi kerak agar HTTPS ishlatilsa
+
+# Sessiya ma'lumotlarini himoyalash (XSS hujumlardan himoya uchun)
+SESSION_COOKIE_HTTPONLY = True
+#-----------------------------------------------------------------------------------------
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-
+#-------------------------------------------------------------------------
+# SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # yoki boshqa backend
+# SESSION_COOKIE_NAME = 'sessionid'
+#-------------------------------------------------------------------------
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

@@ -1,327 +1,224 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="description" content=""/>
-    <meta name="author" content=""/>
-    <title>{{ product.name }} - Product Detail</title>
-    <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="{% static 'products/assets/favicon.ico' %}"/>
-    <!-- Bootstrap icons-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
-    <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="{% static 'products/css/styles.css' %}" rel="stylesheet"/>
-</head>
-<body>
-<!-- Navigation-->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="#!">Start Bootstrap</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
-                class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
-                <li class="nav-item dropdown">
-
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        {% for category in categories %}
-                            <li><a class="dropdown-item"
-                                   href="{% url 'category' category.id %}">{{ category.title }}</a></li>
-                            <li>
-                                <hr class="dropdown-divider"/>
-                            </li>
-                        {% endfor %}
-
-                    </ul>
-
-                </li>
-                <!-- Button trigger modal -->
-                <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#deleteModel">
-                    Delete
-                </button>
-
-                <!-- Modal -->
-                <div class="modal fade" id="deleteModel" tabindex="-1" aria-labelledby="exampleModalLabel"
-                     aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Delete</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                Do you want to delete, are you sure?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                                <form action="{% url 'delete_product' product.id %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-primary">Yes</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#updateModel">
-                    Update
-                </button>
-                <div class="modal fade" id="updateModel" tabindex="-1" aria-labelledby="exampleModalLabel"
-                     aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Update</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                Do you want to update, are you sure?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                                <form action="{% url 'edit_product' product.id %}" >
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-primary">Yes</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </ul>
-
-
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-
-
-        </div>
-    </div>
-
-</nav>
-{% if messages %}
-    {% for message in messages %}
-        {% if 'success' in message.tags %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% else %}
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endif %}
-    {% endfor %}
-{% endif %}
+{% extends 'products/base/base.html' %}
+{% block title %} Detail Page{% endblock %}
 <!-- Product section-->
-<section class="py-5">
-    <div class="container px-4 px-lg-5 my-5">
-        <div class="row gx-4 gx-lg-5 align-items-center">
+{% block detail_content %}
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="row gx-4 gx-lg-5 align-items-center">
 
-            <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0"
-                                       src="{{ product.image.url }}" alt="..."/></div>
+                <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0"
+                                           src="{{ product.image.url }}" alt="..."/></div>
 
-            <div class="col-md-6">
-                <div class="small mb-1">
-                    <span>quantity : {{ product.quantity }}</span>
-                    <h1 class="display-5 fw-bolder">{{ product.name }}</h1>
-                    <div class="fs-5 mb-5">
-                        {% if product.discount_price %}
-                            <span class="text-decoration-line-through">${{ product.price }}</span>
-                            <span>${{ product.discount_price }}</span>
-                        {% else %}
-                            <span>${{ product.price }}</span>
-                        {% endif %}
-                    </div>
-                    <p class="lead">{{ product.description }}</p>
-                    <div class="d-flex">
-                        <!-- Order Form Section -->
-                        {% if product.quantity %}
-                            <form method="post" action="{% url 'product_order' product.id %}">
-                                {% csrf_token %}
-                                <div class="form-group mb-3">
-                                    <input type="text" class="form-control" name="username"
-                                           placeholder="Your name" value="{{ form.username.value }}">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <input type="text" class="form-control" name="phone"
-                                           placeholder="Your phone number" value="{{ form.phone.value }}">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <input type="number" class="form-control" name="quantity"
-                                           placeholder="Quantity" value="{{ form.quantity.value }}">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <button type="submit" class="btn btn-success">Send</button>
-                                </div>
-                                {% if form.errors %}
-                                    <div class="alert alert-danger">
-                                        {% for field in form %}
-                                            {% for error in field.errors %}
-                                                <p>{{ field.label }}: {{ error }}</p>
-                                            {% endfor %}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </form>
-                        {% else %}
-                            </div>
-                            <p class="lead" style="background-color: #fcf77a ">It is not possible to place an order because the product is out of stock. We will try to solve this problem as soon as we can</p>
-                            <div class="d-flex">
-                        {% endif %}
+                <div class="col-md-6">
+                    <div class="small mb-1">
+                        <span>quantity : {{ product.quantity }}</span>
 
-
-                        <!-- Order form end -->
+                        <form method="post" action="{% url 'add_cart' product.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <button type="submit" class="btn btn-secondary">Add to Cart</button>
+                        </form>
+                        <h1 class="display-5 fw-bolder">{{ product.name }}</h1>
+                        <div class="fs-5 mb-5">
+                            {% if product.discount_price %}
+                                <span class="text-decoration-line-through">${{ product.price }}</span>
+                                <span>${{ product.discount_price }}</span>
+                            {% else %}
+                                <span>${{ product.price }}</span>
+                            {% endif %}
                         </div>
+                        <p class="lead">{{ product.description }}</p>
+                        <div class="d-flex">
+                            <!-- Order Form Section -->
+                            {% if product.quantity %}
+                                <form method="post" action="{% url 'product_order' product.id %}">
+                                    {% csrf_token %}
+                                    <div class="form-group mb-3">
+                                        <input type="text" class="form-control" name="username"
+                                               placeholder="Your name" value="{{ form.username.value }}">
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <input type="text" class="form-control" name="phone"
+                                               placeholder="Your phone number" value="{{ form.phone.value }}">
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <input type="number" class="form-control" name="quantity"
+                                               placeholder="Quantity" value="{{ form.quantity.value }}">
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <button type="submit" class="btn btn-success">Send</button>
+                                    </div>
+                                    {% if form.errors %}
+                                        <div class="alert alert-danger">
+                                            {% for field in form %}
+                                                {% for error in field.errors %}
+                                                    <p>{{ field.label }}: {{ error }}</p>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </form>
+                            {% else %}
+                                </div>
+                                <p class="lead" style="background-color: #fcf77a ">It is not possible to place an order
+                                    because the product is out of stock. We will try to solve this problem as soon as we
+                                    can</p>
+                                <div class="d-flex">
+                            {% endif %}
+
+
+                            <!-- Order form end -->
+                            </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<div class="container mt-4 mb-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="text-center">
-                <h2>Latest comments</h2>
+    <div class="container mt-4 mb-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center">
+                    <h2>Latest comments</h2>
+                </div>
+                {% if comments %}
+
+                    {% for comment in comments %}
+
+                        <div class="media card p-4 mt-2">
+
+                            <div class="media-body">
+                                <h3>{{ comment.name }}</h3>
+
+                                {{ comment.comment }}
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                {% else %}
+                    <p>No comments yet.</p>
+                {% endif %}
             </div>
-            {% if comments %}
 
-                {% for comment in comments %}
+            <div class="col-8 offset-2 mt-5">
 
-                    <div class="media card p-4 mt-2">
+                <div class=" p-5">
+                    <div class="text-center">
+                        <h3>Add Comment</h3>
+                    </div>
 
-                        <div class="media-body">
-                            <h3>{{ comment.name }}</h3>
+                    <!-- Comment Form Section -->
+                    <form method="post" action="{% url 'product_comment' product.id %}">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <input type="text" id="name" class="form-control" name="name" placeholder="Your name"
+                                   value="{{ form.name.value }}">
+                        </div>
+                        <div class="form-group mb-3">
+                            <input type="email" id="email" class="form-control" name="email" placeholder="Your email"
+                                   value="{{ form.email.value }}">
+                        </div>
+                        <div class="form-group mb-3">
+                            <textarea id="comment" name="comment" class="form-control" cols="30" rows="10"
+                                      placeholder="Comment">{{ form.comment.value }}</textarea>
+                        </div>
+                        <div class="form-group mb-3">
+                            <button type="submit" class="btn btn-success">Send</button>
+                        </div>
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <p>{{ field.label }}: {{ error }}</p>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </form>
 
-                            {{ comment.comment }}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Related items section-->
+    <section class="py-5 bg-light">
+        <div class="container px-4 px-lg-5 mt-5">
+            <h2 class="fw-bolder mb-4">Related products</h2>
+
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                {% for product in products %}
+                    <div class="col mb-5">
+                        <div class="card h-100">
+                            {% if product.discount %}
+                                <div class="badge bg-warning text-white position-absolute"
+                                     style="top: 0.5rem; left: 0.5rem">Sale
+                                </div>
+                            {% endif %}
+                            <!-- Product image-->
+                            <img class="card-img-top"
+                                 src="{{ product.image.url }}" alt="..."/>
+                            <!-- Product details-->
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <!-- Product name-->
+
+                                    <h5 class="fw-bolder">{{ product.name }}</h5>
+                                    <!-- Product price-->
+                                    {% if product.discount_price %}
+                                        <span class="text-muted text-decoration-line-through">${{ product.price }}</span>
+                                        <span>${{ product.discount_price }}  </span>
+                                        <span>%{{ product.discount }}</span>
+                                    {% else %}
+                                        ${{ product.price }}
+                                    {% endif %}<br>
+                                    <div class="d-flex justify-content-center small text-warning mb-2">
+                                        {% with ''|center:product.rating as ratings %}
+                                            {% for rating in ratings %}
+                                                <div class="bi-star-fill"></div>
+                                            {% endfor %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Product actions-->
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto"
+                                                            href="{% url 'detail' product.id %}">View
+                                    product</a></div>
+
+
+                            </div>
                         </div>
                     </div>
 
                 {% endfor %}
-            {% else %}
-                <p>No comments yet.</p>
-            {% endif %}
-        </div>
-
-        <div class="col-8 offset-2 mt-5">
-
-            <div class=" p-5">
-                <div class="text-center">
-                    <h3>Add Comment</h3>
-                </div>
-
-                <!-- Comment Form Section -->
-                <form method="post" action="{% url 'product_comment' product.id %}">
-                    {% csrf_token %}
-                    <div class="form-group mb-3">
-                        <label for="name">Your name</label>
-                        <input type="text" id="name" class="form-control" name="name" placeholder="Your name"
-                               value="{{ form.name.value }}">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="email">Your email</label>
-                        <input type="email" id="email" class="form-control" name="email" placeholder="Your email"
-                               value="{{ form.email.value }}">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="comment">Comment</label>
-                        <textarea id="comment" name="comment" class="form-control" cols="30" rows="10"
-                                  placeholder="Comment">{{ form.comment.value }}</textarea>
-                    </div>
-                    <div class="form-group mb-3">
-                        <button type="submit" class="btn btn-success">Send</button>
-                    </div>
-                    {% if form.errors %}
-                        <div class="alert alert-danger">
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <p>{{ field.label }}: {{ error }}</p>
-                                {% endfor %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </form>
-
 
             </div>
-
         </div>
-    </div>
-</div>
-<!-- Related items section-->
-<section class="py-5 bg-light">
-    <div class="container px-4 px-lg-5 mt-5">
-        <h2 class="fw-bolder mb-4">Related products</h2>
-
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-            {% for product in products %}
-                <div class="col mb-5">
-                    <div class="card h-100">
-                        {% if product.discount %}
-                            <div class="badge bg-warning text-white position-absolute"
-                                 style="top: 0.5rem; left: 0.5rem">Sale
-                            </div>
-                        {% endif %}
-                        <!-- Product image-->
-                        <img class="card-img-top"
-                             src="{{ product.image.url }}" alt="..."/>
-                        <!-- Product details-->
-                        <div class="card-body p-4">
-                            <div class="text-center">
-                                <!-- Product name-->
-
-                                <h5 class="fw-bolder">{{ product.name }}</h5>
-                                <!-- Product price-->
-                                {% if product.discount_price %}
-                                    <span class="text-muted text-decoration-line-through">${{ product.price }}</span>
-                                    <span>${{ product.discount_price }}  </span>
-                                    <span>%{{ product.discount }}</span>
-                                {% else %}
-                                    ${{ product.price }}
-                                {% endif %}<br>
-                                <div class="d-flex justify-content-center small text-warning mb-2">
-                                    {% with ''|center:product.rating as ratings %}
-                                        {% for rating in ratings %}
-                                            <div class="bi-star-fill"></div>
-                                        {% endfor %}
-                                    {% endwith %}
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Product actions-->
-                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                            <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">View
-                                product</a></div>
-
-
-                        </div>
-                    </div>
-                </div>
-
-            {% endfor %}
-
-        </div>
-    </div>
-</section>
-<!-- Footer-->
-<footer class="py-5 bg-dark">
-    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
-</footer>
-<!-- Bootstrap core JS-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Core theme JS-->
-<script src="{% static 'products/js/scripts.js' %}"></script>
-</body>
-</html>
+    </section>
+    {#    <script>#}
+    {#        $(document).on('click', '#add-cart', function (e) {#}
+    {#            e.preventDefault();#}
+    {#            $.ajax({#}
+    {#                type: 'POST',#}
+    {#                url: {% url 'add_cart' %},#}
+    {#                data: {#}
+    {#                    product_id: $('#add-cart').val(),#}
+    {#                    csrfmiddlewaretoken: '{{ csrf_token }}',#}
+    {#                    action: 'post'#}
+    {#                },#}
+    {#                success: function (json) {#}
+    {#                    console.log(json)#}
+    {#                },#}
+    {#                error: function (xhr, errmdg, err) {#}
+    {##}
+    {#                }#}
+    {##}
+    {#            });#}
+    {#        })#}
+    {##}
+    {##}
+    {#    </script>#}
+{% endblock %}
