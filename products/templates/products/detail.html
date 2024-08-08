@@ -1,74 +1,93 @@
 {% extends 'products/base/base.html' %}
-{% block title %} Detail Page{% endblock %}
+{% block title %}Detail Page{% endblock %}
 <!-- Product section-->
 {% block detail_content %}
     <section class="py-5">
         <div class="container px-4 px-lg-5 my-5">
             <div class="row gx-4 gx-lg-5 align-items-center">
 
-                <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0"
-                                           src="{{ product.image.url }}" alt="..."/></div>
+                <div class="col-md-6">
+                    <img class="card-img-top mb-5 mb-md-0" src="{{ product.image.url }}" alt="..."/>
+                </div>
 
                 <div class="col-md-6">
                     <div class="small mb-1">
                         <span>quantity : {{ product.quantity }}</span>
-
-                        <form method="post" action="{% url 'add_cart' product.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="product_id" value="{{ product.id }}">
-                            <button type="submit" class="btn btn-secondary">Add to Cart</button>
-                        </form>
-                        <h1 class="display-5 fw-bolder">{{ product.name }}</h1>
-                        <div class="fs-5 mb-5">
-                            {% if product.discount_price %}
-                                <span class="text-decoration-line-through">${{ product.price }}</span>
-                                <span>${{ product.discount_price }}</span>
-                            {% else %}
-                                <span>${{ product.price }}</span>
-                            {% endif %}
-                        </div>
-                        <p class="lead">{{ product.description }}</p>
+                        <div class="">
                         <div class="d-flex">
-                            <!-- Order Form Section -->
-                            {% if product.quantity %}
-                                <form method="post" action="{% url 'product_order' product.id %}">
-                                    {% csrf_token %}
-                                    <div class="form-group mb-3">
-                                        <input type="text" class="form-control" name="username"
-                                               placeholder="Your name" value="{{ form.username.value }}">
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <input type="text" class="form-control" name="phone"
-                                               placeholder="Your phone number" value="{{ form.phone.value }}">
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <input type="number" class="form-control" name="quantity"
-                                               placeholder="Quantity" value="{{ form.quantity.value }}">
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <button type="submit" class="btn btn-success">Send</button>
-                                    </div>
-                                    {% if form.errors %}
-                                        <div class="alert alert-danger">
-                                            {% for field in form %}
-                                                {% for error in field.errors %}
-                                                    <p>{{ field.label }}: {{ error }}</p>
-                                                {% endfor %}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </form>
-                            {% else %}
-                                </div>
-                                <p class="lead" style="background-color: #fcf77a ">It is not possible to place an order
-                                    because the product is out of stock. We will try to solve this problem as soon as we
-                                    can</p>
-                                <div class="d-flex">
-                            {% endif %}
+                            <form style="margin-right: 5px" method="post" action="{% url 'add_cart' product.slug %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button type="submit" class="btn btn-outline-secondary">Add to Cart</button>
+                            </form>
+                            <form style="margin-right: 5px" action="{% url 'edit_product' product.slug %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-secondary">Update</button>
+                            </form>
 
+                            <form style="margin-right: 5px" method="post" action="{% url 'delete_product' product.slug %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">Delete</button>
+                            </form>
+                        </div>
 
-                            <!-- Order form end -->
+                            <h1 class="display-5 fw-bolder">{{ product.name }}</h1>
+                            <div class="fs-5 mb-5">
+                                {% if product.discount_price %}
+                                    <span class="text-decoration-line-through">${{ product.price }}</span>
+                                    <span>${{ product.discount_price }}</span>
+                                {% else %}
+                                    <span>${{ product.price }}</span>
+                                {% endif %}
                             </div>
+                            <p class="lead">{{ product.description }}</p>
+                            <div class="d-flex">
+                                <!-- Order Form Section -->
+                                <!--if a product ends in the database it won't allow to order --->
+                                {% if product.quantity %}
+                                    <form method="post" action="{% url 'product_order' product.slug %}">
+                                        {% csrf_token %}
+                                        <div class="form-group mb-3">
+                                            <input type="text" class="form-control" name="username"
+                                                   placeholder="Your name"
+                                                   value="{{ form.username.value }}">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <input type="text" class="form-control" name="phone"
+                                                   placeholder="Your phone number"
+                                                   value="{{ form.phone.value }}">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <input type="number" class="form-control" name="quantity"
+                                                   placeholder="Quantity" value="{{ form.quantity.value }}">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <button type="submit" class="btn btn-success">Send</button>
+                                        </div>
+                                        {% if form.errors %}
+                                            <div class="alert alert-danger">
+                                                {% for field in form %}
+                                                    {% for error in field.errors %}
+                                                        <p>{{ field.label }}: {{ error }}</p>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </form>
+                                {% else %}
+
+                                    <p class="lead" style="background-color: #fcf77a ">It is not possible to
+                                        place an order
+                                        because the product is out of stock. We will try to solve this
+                                        problem as soon as we
+                                        can</p>
+                                    <div class="d-flex">
+                                {% endif %}
+                            </div>
+
+                                <!-- Order form end -->
+                                </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -108,7 +127,7 @@
                     </div>
 
                     <!-- Comment Form Section -->
-                    <form method="post" action="{% url 'product_comment' product.id %}">
+                    <form method="post" action="{% url 'product_comment' product.slug %}">
                         {% csrf_token %}
                         <div class="form-group mb-3">
                             <input type="text" id="name" class="form-control" name="name" placeholder="Your name"
@@ -185,7 +204,7 @@
                             <!-- Product actions-->
                             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
                                 <div class="text-center"><a class="btn btn-outline-dark mt-auto"
-                                                            href="{% url 'detail' product.id %}">View
+                                                            href="{% url 'detail' product.slug %}">View
                                     product</a></div>
 
 
@@ -198,27 +217,5 @@
             </div>
         </div>
     </section>
-    {#    <script>#}
-    {#        $(document).on('click', '#add-cart', function (e) {#}
-    {#            e.preventDefault();#}
-    {#            $.ajax({#}
-    {#                type: 'POST',#}
-    {#                url: {% url 'add_cart' %},#}
-    {#                data: {#}
-    {#                    product_id: $('#add-cart').val(),#}
-    {#                    csrfmiddlewaretoken: '{{ csrf_token }}',#}
-    {#                    action: 'post'#}
-    {#                },#}
-    {#                success: function (json) {#}
-    {#                    console.log(json)#}
-    {#                },#}
-    {#                error: function (xhr, errmdg, err) {#}
-    {##}
-    {#                }#}
-    {##}
-    {#            });#}
-    {#        })#}
-    {##}
-    {##}
-    {#    </script>#}
+
 {% endblock %}

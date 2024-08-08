@@ -38,7 +38,7 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         {% for category in categories %}
                             <li><a class="dropdown-item"
-                                   href="{% url 'category' category.id %}">{{ category.title }}</a></li>
+                                   href="{% url 'category' category.slug %}">{{ category.title }}</a></li>
                             <li>
                                 <hr class="dropdown-divider"/>
                             </li>
@@ -46,6 +46,7 @@
                     </ul>
                 </li>
                 <!-- Product add selection-->
+
                 {% if user.is_authenticated %}
                     <form action="{% url 'add_product' %}">
                         {% csrf_token %}
@@ -84,6 +85,7 @@
                         </div>
                     </div>
                 {% endif %}
+
                 <!--Shopping cart-->
                 <a href="{% url 'summary_cart' %}" class="btn btn-light">
                     <i class="bi bi-cart-fill"></i>cart

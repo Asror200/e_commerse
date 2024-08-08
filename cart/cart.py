@@ -1,5 +1,3 @@
-from django.contrib import messages
-
 
 class Cart():
     def __init__(self, request):

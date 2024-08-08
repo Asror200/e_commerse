@@ -16,9 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from django.conf.urls.i18n import i18n_patterns
+from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('products.urls')),
     path('cart/', include('cart.urls')),
 ]
+if settings.USE_I18N:
+    urlpatterns += i18n_patterns(
+        path('', include('products.urls')),
+    )

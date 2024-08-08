@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
+import jazzmin
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -27,10 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +42,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.locale.LocaleMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,7 +74,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -82,7 +83,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -102,7 +102,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -113,38 +112,48 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-#----------------------------------------------------------------------------------------
-# settings.py
+# -----------------
 
-# Sessiya ma'lumotlari saqlanadigan backend
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # yoki boshqa backend
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-# Sessiya cookie nomi
 SESSION_COOKIE_NAME = 'sessionid'
 
-# Sessiya cookie muddati
-SESSION_COOKIE_AGE = 1209600  # 2 hafta, sekundlarda
+SESSION_COOKIE_AGE = 12096000000
+SESSION_COOKIE_SECURE = False
 
-# Sessiya cookie'ni HTTP orqali faqat yuborish (xavfsizlik uchun)
-SESSION_COOKIE_SECURE = False  # True bo'lishi kerak agar HTTPS ishlatilsa
-
-# Sessiya ma'lumotlarini himoyalash (XSS hujumlardan himoya uchun)
 SESSION_COOKIE_HTTPONLY = True
-#-----------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-#-------------------------------------------------------------------------
-# SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # yoki boshqa backend
-# SESSION_COOKIE_NAME = 'sessionid'
-#-------------------------------------------------------------------------
+
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+JAZZMIN_SETTINGS = {
+    "site_title": "My Admin",
+    "welcome_sign": "Welcome to Admin Panel",
+    "login_logo": None,
+    "search_model": ["auth.User"],
+    "topmenu_links": [
+
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+
+        {"name": "Support", "url": "https://github.com/Asror200", "new_window": True},
+        {"name": "About", "url": "/about/", "new_window": True},
+    ],
+    "copyright": "Admin Panel",
+    "language_chooser": True,
+
+}
+JAZZMIN_UI_TWEAKS = {
+
+    "theme": "litera",
+}

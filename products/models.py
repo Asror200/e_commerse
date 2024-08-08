@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.template.defaultfilters import slugify
 
 
 # Create your models here.
@@ -12,10 +13,19 @@ class BaseModel(models.Model):
 
 
 class Category(BaseModel):
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = 'categories'
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super(Category, self).save(*args, **kwargs)
 
 
 class Product(BaseModel):
@@ -35,6 +45,12 @@ class Product(BaseModel):
     rating = models.PositiveSmallIntegerField(choices=RatingChoices.choices, default=RatingChoices.zero.value)
     discount = models.PositiveSmallIntegerField(default=0)
     image = models.ImageField(upload_to='images', null=True, blank=True)
+    slug = models.SlugField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Product, self).save(*args, **kwargs)
 
     @property
     def discount_price(self):

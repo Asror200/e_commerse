@@ -13,17 +13,17 @@ def summary_cart(request):
     return render(request, 'cart/cummary.html', {'products': products})
 
 
-def add_cart(request, product_id):
+def add_cart(request, product_slug):
     if request.method == 'POST':
         _id = int(request.POST.get('product_id'))
         product = get_object_or_404(Product, id=_id)
         cart = Cart(request)
-        if cart.checkout(product_id):
+        if cart.checkout(product_slug):
             cart.add(product)
             messages.add_message(request, level=messages.SUCCESS, message='Successfully added to the cart')
-            return redirect('detail', product_id)
+            return redirect('detail', product_slug)
         messages.add_message(request, level=messages.ERROR, message='This product already exist in your cart')
-        return redirect('detail', product_id)
+        return redirect('detail', product_slug)
     else:
         return messages.add_message(request, level=messages.ERROR, message='Something went wrong, please try again')
 
