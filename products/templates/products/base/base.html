@@ -72,11 +72,11 @@
                                     You must log in first to add a product
                                 </div>
                                 <div class="modal-footer">
-                                    <form action="{% url 'register' %}">
+                                    <form action="{% url 'register_page' %}">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-secondary">Register</button>
                                     </form>
-                                    <form action="{% url 'login' %}">
+                                    <form action="{% url 'login_page' %}">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-primary">I already have an account</button>
                                     </form>
@@ -101,15 +101,14 @@
             </form>
             <!--login or logout-->
             {% if request.user.is_authenticated %}
-                <form action="{% url 'logout' %}" method="post">
-                    {% csrf_token %}
-                    <a class="btn btn-outline-success me-2  ml-auto d-none d-lg-block ms-2" href="{% url 'logout' %}">Logout</a>
-                </form>
+                <a class="btn btn-outline-success me-2  ml-auto d-none d-lg-block ms-2" href="{% url 'logout_page' %}">Logout</a>
             {% else %}
-                <a class="btn btn-outline-success px-4 ml-auto d-none me-2 d-lg-block ms-2" href="{% url 'register' %}">Register</a>
+                <a class="btn btn-outline-success px-4 ml-auto d-none me-2 d-lg-block ms-2" href="{% url 'login_page' %}">Login</a>
             {% endif %}
         </div>
+
     </div>
+
 </nav>
 <!-- Message send -->
 {% if messages %}
