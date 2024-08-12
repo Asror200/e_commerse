@@ -5,23 +5,18 @@ from django.contrib.auth import authenticate, login, logout
 
 
 def register_user(request):
-    form = SignUpForm()
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            form.save()
-            user = authenticate(username=username, password=password)
+            user = form.save(commit=False)
+            user.save()
             login(request, user)
             messages.add_message(request, level=messages.SUCCESS,
-                                 message=f'Account created for {username} '
+                                 message=f'Account created '
                                          f'and logged in successfully.')
             return redirect('home')
-        else:
-            messages.add_message(request, level=messages.ERROR,
-                                 message=f'Something went wrong. Please try again.')
-            return redirect('register')
+    else:
+        form = SignUpForm()
 
     return render(request, 'auth/register.html', {'form': form})
 
@@ -47,6 +42,3 @@ def logout_user(request):
     logout(request)
     messages.success(request, 'You have been logged out.')
     return redirect('home')
-
-
-
