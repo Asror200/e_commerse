@@ -1,7 +1,6 @@
 import re
 from django import forms
-from .models import Comment, Order, Product
-from django.contrib.auth.models import User
+from .models import Comment, Order, Product, User
 
 
 class CommentModelForm(forms.ModelForm):
